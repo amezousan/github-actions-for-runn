@@ -1,0 +1,54 @@
+desc: Http Request Examples on Postman
+runners:
+  req: https://postman-echo.com/
+vars:
+  foo1: bar1
+  foo2: bar2
+  base64Auth: "${POSTMAN_BASIC_AUTH}" # echo -n "postman:password"|base64
+steps:
+  read:
+    req:
+      /get?foo1={{ vars.foo1 }}:
+        get:
+          body: null
+    test: |
+      steps.read.res.status == 200 &&
+      steps.read.res.body.args.foo1 == vars.foo1
+
+  update:
+    req:
+      /put:
+        put:
+          body:
+            application/json:
+              {
+                "foo1": "{{ vars.foo1 }}",
+                "foo2": "{{ vars.foo2 }}",
+              }
+    test: steps.update.res.status == 200
+    test: steps.update.res.body.data.foo1 == vars.foo1
+
+  patch:
+    req:
+      /patch:
+        patch:
+          body:
+            application/json:
+              {
+                "foo1": "{{ steps.update.res.body.url }}",
+                "foo2": "{{ vars.foo2 }}",
+              }
+    test: |
+      steps.patch.res.status == 200 && 
+      steps.patch.res.body.data.foo1 == steps.update.res.body.url
+
+  basicAuth:
+    req:
+      /basic-auth:
+        get:
+          headers:
+            "Authorization": "Basic {{vars.base64Auth}}"
+          body: null
+    test: |
+      steps.basicAuth.res.status == 200 && 
+      steps.basicAuth.res.body.authenticated == true

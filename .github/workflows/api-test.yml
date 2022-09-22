@@ -1,0 +1,21 @@
+name: Backend API Tests
+
+on: push
+
+jobs:
+  run-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Run tests with Runn
+        uses: docker://ghcr.io/k1low/runn:v0.35.0
+        with:
+          context: .
+          entrypoint: 'runn'
+          args: |
+            run test-scenarios/*.yml --debug
+        env:
+          # echo -n "postman:password"|base64
+          POSTMAN_BASIC_AUTH: ${{ secrets.POSTMAN_BASIC_AUTH }}

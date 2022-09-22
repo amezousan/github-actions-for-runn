@@ -46,3 +46,39 @@ Now you should see the result of the workflow :) Welcome to a DevOps world :D
             # * is a special character in YAML so you have to quote this string
             - cron:  '30 5,17 * * *'
     ```
+
+### Use Runn locally
+You can also use [Runn](https://github.com/k1LoW/runn) to test your scenarios: e.g., `runn run --debug test-scenarios/*`
+
+However, there are a few tips to use it properly:
+
+#### Define a default value in variables
+In some cases, I've seen such an error when I loaded an undefined-variable in my scenarios:
+
+```sh
+Run 'req' on 'Http Request Examples on Postman'.steps.read
+panic: interface conversion: interface {} is nil, not string
+
+goroutine 1 [running]:
+github.com/k1LoW/runn.parseHTTPRequest(0x49?)
+```
+
+This is because Runn sometimes cannot handle a null value, so you can avoid such an error by defining default values.
+
+```yml
+diff --git a/test-scenarios/crudPostman.yml b/test-scenarios/crudPostman.yml
+index 25240f6..8d4b28d 100644
+--- a/test-scenarios/crudPostman.yml
++++ b/test-scenarios/crudPostman.yml
+@@ -4,7 +4,7 @@ runners:
+ vars:
+   foo1: bar1
+   foo2: bar2
+-  base64Auth: "${POSTMAN_BASIC_AUTH}" # echo -n "postman:password"|base64
++  base64Auth: "${POSTMAN_BASIC_AUTH:-none}" # echo -n "postman:password"|base64
+```
+
+#### Pass a value for the variable
+You can do either:
+* `export POSTMAN_BASIC_AUTH=cG9zdG1hbjpwYXNzd29yZA==` on your shell OR
+* Put that one into your shell profile: e.g., `~/.zshrc`

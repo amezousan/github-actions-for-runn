@@ -4,7 +4,7 @@ runners:
 vars:
   foo1: bar1
   foo2: bar2
-  base64Auth: "${POSTMAN_BASIC_AUTH}" # echo -n "postman:password"|base64
+  base64Auth: "${POSTMAN_BASIC_AUTH:-cG9zdG1hbjpwYXNzd29yZA==}" # echo -n "postman:password"|base64
 steps:
   read:
     req:
